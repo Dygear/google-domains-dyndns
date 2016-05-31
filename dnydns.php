@@ -1,4 +1,5 @@
-<?
+<?php
+
 	// Global Defines
 	const USER = '';
 	const PASS = '';
@@ -20,10 +21,14 @@
 	file_put_contents('ipOnFile.txt', $get_ip);
 
 	# Update Google's DNS Server
-	$cURL = curl_init('https://domains.google.com/nic/update?hostname=' . HOST);
-	curl_setopt($cURL, CURLOPT_USERPWD, USER . ":" . PASS); 
-	curl_setopt($cURL, CURLOPT_USERAGENT, 'User-Agent: Chrome/41.0 ' . MAIL);
-	echo curl_exec($cURL);
-	curl_close($cURL);
+	$context = stream_context_create([
+		'http' => [
+			'method' => 'GET',
+			'header' => 'Authorization: Basic ' . base64_encode(USER . ':' . PASS) . "\r\n"
+					.	'User-Agent: Chrome/50.0 ' . MAIL
+		]
+	]);
+	echo file_get_contents('https://domains.google.com/nic/update?hostname=' . HOST, FALSE, $context);
+	print_r($http_response_header);
 
 ?>
